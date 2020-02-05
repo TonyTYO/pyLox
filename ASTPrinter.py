@@ -7,9 +7,10 @@ import loxtoken
 
 class ASTStmtPrinter(loxStmtAST.Visitor):
 
-    INDENT: int = 0
+    INDENT: int = 0     # Indent for statement blocks
 
     def print(self, stmt: Union[loxStmtAST.Stmt, List[loxStmtAST.Stmt]]) -> str:
+        """ Print statement or list of statements """
         if isinstance(stmt, list):
             return self.print_list(stmt)
         else:
@@ -19,6 +20,7 @@ class ASTStmtPrinter(loxStmtAST.Visitor):
 
     @staticmethod
     def print_list(stmt: List[loxStmtAST.Stmt]) -> str:
+        """ Print list of statements with indent """
         print_st: str = "\n" + ASTStmtPrinter.INDENT * ' ' + "Start List ===\n"
         if ASTStmtPrinter.INDENT != 0:
             ASTStmtPrinter.INDENT = int(ASTStmtPrinter.INDENT * 2)
@@ -77,6 +79,7 @@ class ASTStmtPrinter(loxStmtAST.Visitor):
 class ASTPrinter(loxExprAST.Visitor):
 
     def print(self, expr: Union[loxExprAST.Expr, List[loxExprAST.Expr]]) -> str:
+        """ Print expression """
         print_exp: str = ""
         if isinstance(expr, list):
             for ex in expr:
@@ -125,6 +128,7 @@ class ASTPrinter(loxExprAST.Visitor):
         return self.parenthesize(expr.operator.lexeme, expr.right)
 
     def parenthesize(self, name: str, *exprs: loxExprAST.Expr) -> str:
+        """ Parenthesize expression """
         builder: list = list()
         builder.append("(")
         builder.append(name)
@@ -137,6 +141,7 @@ class ASTPrinter(loxExprAST.Visitor):
 
 
 def main():
+    """ Print test expression """
     expression = loxExprAST.Binary(
         loxExprAST.Unary(
             loxtoken.Token(loxtoken.TokenType.MINUS, "-", None, 1),
