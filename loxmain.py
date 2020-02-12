@@ -14,7 +14,8 @@ if TYPE_CHECKING:
 
 
 class Lox:
-    """ Main interpreter class """
+    """ Main program class
+        Runs the Lox interpreter """
 
     had_error: bool = False  # flag error to stop processing
 
@@ -38,12 +39,6 @@ class Lox:
         """ Run script from file
             Read whole file into string """
 
-        # try:
-        #    with open(file_name, 'r') as source_file:
-        #        self.run(source_file.read())
-        # except Exception as error:
-        #    print(error)
-        #    pass
         with open(file_name, 'r') as source_file:
             self.run(source_file.read())
 

@@ -22,6 +22,8 @@ class Resolver:
         self.current_function: Resolver.FunctionType = Resolver.FunctionType.NONE
         self.current_class: Resolver.ClassType = Resolver.ClassType.NONE
 
+    # ---------------------------------------------------------------------------------
+
     def visit_block_stmt(self, stmt: loxStmtAST.Block) -> None:
         self.begin_scope()
         self.resolve(stmt.statements)
@@ -156,7 +158,10 @@ class Resolver:
         self.resolve_expr(expr.right)
         return None
 
+    # ---------------------------------------------------------------------------------
+
     def resolve(self, stmts: List[loxStmtAST.Stmt]) -> None:
+        """ Walks a list of statements and resolves each one """
         try:
             for stmt in stmts:
                 self.resolve_stmt(stmt)
@@ -164,12 +169,15 @@ class Resolver:
             print(error)
 
     def resolve_stmt(self, stmt: loxStmtAST.Stmt) -> None:
+        """ Resolve statemnt """
         stmt.accept(self)
 
     def resolve_expr(self, expr: loxExprAST.Expr) -> None:
+        """ Resolve expression """
         expr.accept(self)
 
     def resolve_local(self, expr: loxExprAST.Expr, name: Token) -> None:
+        """ Resolve variable. Send depth to interpreter to store """
         pos = 0
         for scope in self.scopes:
             if name.lexeme in scope:
@@ -179,6 +187,7 @@ class Resolver:
         # Not found. Assume it is global.
 
     def resolve_function(self, funct: loxStmtAST.Function, functype: 'Resolver.FunctionType') -> None:
+        """ Resolve function """
         enclosing_function: Resolver.FunctionType = self.current_function
         self.current_function = functype
         self.begin_scope()
@@ -191,12 +200,15 @@ class Resolver:
         self.current_function = enclosing_function
 
     def begin_scope(self):
+        """ Create new scope """
         self.scopes.push(dict())
 
     def end_scope(self):
+        """ Delete scope """
         self.scopes.pop()
 
     def declare(self, name: Token):
+        """ Declare variable. Set value to False """
         if self.scopes.is_empty():
             return None
         if name.lexeme in self.scopes.peek():
@@ -204,6 +216,7 @@ class Resolver:
         self.scopes.peek()[name.lexeme] = False
 
     def define(self, name: Token):
+        """ Define variable. Set value to True """
         if self.scopes.is_empty():
             return None
         self.scopes.peek()[name.lexeme] = True

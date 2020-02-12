@@ -403,6 +403,7 @@ class Parser:
         return self.tokens[self.current - 1]
 
     def synchronize(self):
+        """ Synchronize for recovery after error """
         self.advance()
         while not self.is_at_end():
             if self.previous().tok_type == Parser.tokentypes.SEMICOLON:

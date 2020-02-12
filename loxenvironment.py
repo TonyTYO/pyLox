@@ -25,6 +25,7 @@ class Environment:
         self.ancestor(distance).values[name.lexeme] = value
 
     def ancestor(self, distance: int) -> 'Environment':
+        """ Return environment at distance steps from current """
         environment = self
         for i in range(distance):
             environment = environment.enclosing

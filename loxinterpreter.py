@@ -19,31 +19,7 @@ class Interpreter:
         self.environment: loxenvironment.Environment = self.globals
         self.locals: Dict[loxExprAST.Expr, int] = dict()
 
-    def interpret(self, stmts: List[loxStmtAST.Stmt]) -> None:
-        try:
-            for statement in stmts:
-                self.execute(statement)
-        except RuntimeError as error:
-            print(error)
-
-    def execute(self, stmt: loxStmtAST.Stmt) -> None:
-        stmt.accept(self)
-
-    def execute_list(self, stmt: List[loxStmtAST.Stmt]) -> None:
-        for st in stmt:
-            st.accept(self)
-
-    def resolve(self, expr: loxExprAST.Expr, depth: int) -> None:
-        self.locals[expr] = depth
-
-    def execute_block(self, stmt: List[loxStmtAST.Stmt], environment: loxenvironment.Environment) -> None:
-        previous_env: loxenvironment.Environment = self.environment
-        try:
-            self.environment = environment
-            for statement in stmt:
-                self.execute(statement)
-        finally:
-            self.environment = previous_env
+    # ---------------------------------------------------------------------------------
 
     def visit_block_stmt(self, stmt: loxStmtAST.Block) -> None:
         self.execute_block(stmt.statements, loxenvironment.Environment(self.environment))
@@ -232,7 +208,41 @@ class Interpreter:
             return self.is_true(right)
         return None
 
+    # ---------------------------------------------------------------------------------
+
+    def interpret(self, stmts: List[loxStmtAST.Stmt]) -> None:
+        """ Main entry point """
+        try:
+            for statement in stmts:
+                self.execute(statement)
+        except RuntimeError as error:
+            print(error)
+
+    def execute(self, stmt: loxStmtAST.Stmt) -> None:
+        """ Execute statement """
+        stmt.accept(self)
+
+    def execute_list(self, stmt: List[loxStmtAST.Stmt]) -> None:
+        """ Execute list of statements """
+        for st in stmt:
+            st.accept(self)
+
+    def resolve(self, expr: loxExprAST.Expr, depth: int) -> None:
+        """ Called from resolver to store depth """
+        self.locals[expr] = depth
+
+    def execute_block(self, stmt: List[loxStmtAST.Stmt], environment: loxenvironment.Environment) -> None:
+        """ Execute block stateemt - called by visit_block_stmt """
+        previous_env: loxenvironment.Environment = self.environment
+        try:
+            self.environment = environment
+            for statement in stmt:
+                self.execute(statement)
+        finally:
+            self.environment = previous_env
+
     def lookup_variable(self, name: loxtoken.Token, expr: loxExprAST.Expr) -> object:
+        """ Get variable (at resolved location) """
         distance: int = self.locals.get(expr)
         if distance is not None:
             return self.environment.get_at(distance, name.lexeme)
@@ -244,6 +254,8 @@ class Interpreter:
 
     @staticmethod
     def is_true(expr: Any) -> bool:
+        """ Check if True
+            false and nil are falsey and everything else is truthy """
         if expr is None:
             return False
         if isinstance(expr, bool):
@@ -252,6 +264,7 @@ class Interpreter:
 
     @staticmethod
     def is_equal(o1: object, o2: object) -> bool:
+        """ Check if two objects are equal """
         if o1 is None and o2 is None:
             return True
         if o1 is None:
@@ -260,6 +273,7 @@ class Interpreter:
 
     @staticmethod
     def check_number_operands(operator: loxtoken.Token, op1: Any, op2: Any = None) -> bool:
+        """ Check if one or two operands are numeric (float) """
         if op2 is None:
             if isinstance(op1, float):
                 return True
