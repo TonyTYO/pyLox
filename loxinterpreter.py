@@ -250,6 +250,7 @@ class Interpreter:
             return self.globals.get(name)
 
     def evaluate(self, expr: loxExprAST.Expr) -> Any:
+        """ Evaluate expression """
         return expr.accept(self)
 
     @staticmethod
