@@ -404,11 +404,11 @@ class Parser:
 
     def synchronize(self):
         """ Synchronize for recovery after error """
+        check_tokens = Parser.tokentypes.create_list(["class", "fun", "var", "for", "if", "while", "print", "return"])
         self.advance()
         while not self.is_at_end():
             if self.previous().tok_type == Parser.tokentypes.SEMICOLON:
                 return
-            if self.peek().tok_type in Parser.tokentypes.create_list(
-                    ["class", "fun", "var", "for", "if", "while", "print", "return"]):
+            if self.peek().tok_type in check_tokens:
                 return
             self.advance()
